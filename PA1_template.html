@@ -262,7 +262,14 @@ all_data=full_join(filledData, final)</code></pre>
       &quot;weekdays&quot;
     }
   }
-  all_data_group_by_week = all_data %&gt;% mutate(weekday= ifelse(weekdays(date) %in% c(&quot;Saturday&quot;, &quot;Sunday&quot;), &quot;weekend&quot;, &quot;weekday&quot;)) %&gt;% group_by(weekday) %&gt;% summarize(steps=sum(steps))</code></pre>
+  all_data_group_by_week = all_data %&gt;% mutate(weekday= ifelse(weekdays(date) %in% c(&quot;Saturday&quot;, &quot;Sunday&quot;), &quot;weekend&quot;, &quot;weekday&quot;)) %&gt;% group_by(weekday) %&gt;% summarize(steps=sum(steps))
+  
+  all_data_group_by_week</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   weekday  steps
+##   &lt;chr&gt;    &lt;int&gt;
+## 1 weekday 460762
+## 2 weekend 194974</code></pre>
 <pre class="r"><code>all_data1 = all_data %&gt;% mutate(weekday= ifelse(weekdays(date) %in% c(&quot;Saturday&quot;, &quot;Sunday&quot;), &quot;weekend&quot;, &quot;weekday&quot;))
 
 

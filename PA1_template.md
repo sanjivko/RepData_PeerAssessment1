@@ -155,6 +155,16 @@ Comparing with the mean and median of the partial data, there is no significant 
     }
   }
   all_data_group_by_week = all_data %>% mutate(weekday= ifelse(weekdays(date) %in% c("Saturday", "Sunday"), "weekend", "weekday")) %>% group_by(weekday) %>% summarize(steps=sum(steps))
+  
+  all_data_group_by_week
+```
+
+```
+## # A tibble: 2 x 2
+##   weekday  steps
+##   <chr>    <int>
+## 1 weekday 460762
+## 2 weekend 194974
 ```
 
 

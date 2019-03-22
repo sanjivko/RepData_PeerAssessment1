@@ -7,19 +7,80 @@ output:
 
 
 ## Loading and preprocessing the data
-
+```{r echo=TRUE }
+  library(dplyr)
+  library(ggplot2)
+  d=read.csv("activity.csv", stringsAsFactors = FALSE)
+  x=complete.cases(d)
+  final = tbl_df(d[x,])
+  final = final %>% mutate(date=as.Date(date))
+```
 
 
 ## What is mean total number of steps taken per day?
+```{r echo=TRUE}
+  noOfStepsByDate = final %>% group_by(date) %>% summarise(steps=sum(steps)) %>% mutate(dt=as.Date(date))
+  ggplot(noOfStepsByDate, aes(x=dt, y=steps))+geom_col()
+```
 
+```{r echo=TRUE}
+  summary(noOfStepsByDate$steps)
+```
 
 
 ## What is the average daily activity pattern?
+```{r echo=TRUE}
+ggplot(final, aes(x=interval, y=steps))+geom_line()+stat_summary(geom="line",lwd=2, col="red")
+```
 
-
+```{r echo=TRUE}
+noOfStepsByDate = final %>% group_by(interval) %>% summarise(steps=mean(steps))  %>% arrange(desc(steps))
+noOfStepsByDate[1,]
+```
 
 ## Imputing missing values
+Missing Values Count
+```{r echo=TRUE}
+NumberOfMissingValues=count(tbl_df(d[!x,]))
+as.numeric(NumberOfMissingValues)
+```
+```{r echo = TRUE}
+avgStepsPerInterval = final %>% group_by(interval) %>% summarise(steps=mean(steps))
+filledData=left_join(d[!x,],avgStepsPerInterval, by=c('interval')) %>% select(date,interval, steps.y)
+colnames(filledData) <- c('date', 'interval', 'steps')
+filledData <- tbl_df(filledData)
+filledData= filledData %>% mutate(steps=as.integer(steps)) %>% mutate(date=as.Date(date))
+all_data=full_join(filledData, final)
+noOfStepsByDate1 = all_data %>% group_by(date) %>% summarise(steps=sum(steps)) %>% mutate(dt=as.Date(date))
+  ggplot(noOfStepsByDate1, aes(x=dt, y=steps))+geom_col()
 
-
-
+  summary(noOfStepsByDate$steps)
+```
+Comparing with the mean and median of the partial data, there is no significant difference after imputing missing data.
+  
+  
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r echo = TRUE}
+  f_day = function(...){
+    val = weekdays(...)
+    #print(val)
+    if (val == 'Sunday' || val == 'Saturday'){
+      "Weekends"
+    }
+    else{
+      "weekdays"
+    }
+  }
+  all_data_group_by_week = all_data %>% mutate(weekday= ifelse(weekdays(date) %in% c("Saturday", "Sunday"), "weekend", "weekday")) %>% group_by(weekday) %>% summarize(steps=sum(steps))
+  
+  
+  
+```
+
+```{r echo=TRUE}
+all_data1 = all_data %>% mutate(weekday= ifelse(weekdays(date) %in% c("Saturday", "Sunday"), "weekend", "weekday"))
+
+
+ggplot(all_data1, aes(x=interval, y=steps))+geom_line()+facet_grid(weekday ~ .)+stat_summary(geom="line",lwd=2, col="red")
+
+```
